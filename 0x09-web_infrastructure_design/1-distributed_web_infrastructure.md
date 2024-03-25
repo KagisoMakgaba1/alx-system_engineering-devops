@@ -2,18 +2,18 @@
 
 ## Specifics of the Infrastructure
 
-** Additional elements
+* Additional elements
 1. 2 servers:
    - Adding multiple servers allows for redundancy and load distribution, reducing the risk of downtime due to hardware failures or maintenance.
- 2. 1 web server (Nginx):
+2. 1 web server (Nginx):
    - Nginx is a high-performance web server and reverse proxy that can handle large amounts of concurrent connections efficiently. It's chosen for its scalability, speed, and ability to serve static content quickly.
- 3. 1 application server:
+3. 1 application server:
    - The application server hosts the application logic, handling dynamic content generation, user authentication, and business logic processing.
- 4. 1 load-balancer (HAproxy):
+4. 1 load-balancer (HAproxy):
    - The load balancer distributes incoming web traffic across multiple servers to optimize resource utilization and ensure high availability. HAproxy is a reliable and efficient choice for this purpose.
- 5. 1 set of application files (your code base):
+5. 1 set of application files (your code base):
    - The application files contain the source code, configuration files, and assets required to run the web application.
- 6. 1 database (MySQL):
+6. 1 database (MySQL):
    - MySQL is a popular relational database management system chosen for its reliability, performance, and scalability. It stores and manages the application's data.
 
 * Distribution algorithm for the load balancer (HAproxy):
