@@ -2,8 +2,8 @@
 
 ## Specifics of the Infrastructure
 
-* Additional elements
- 1. 2 servers:
+** Additional elements
+1. 2 servers:
    - Adding multiple servers allows for redundancy and load distribution, reducing the risk of downtime due to hardware failures or maintenance.
  2. 1 web server (Nginx):
    - Nginx is a high-performance web server and reverse proxy that can handle large amounts of concurrent connections efficiently. It's chosen for its scalability, speed, and ability to serve static content quickly.
