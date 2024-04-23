@@ -21,3 +21,4 @@ if [[ ! $? ]]; then
   echo "ERROR: Failed to start Nginx" 1>&2
   exit 1
 fi
+
