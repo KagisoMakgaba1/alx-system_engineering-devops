@@ -1,39 +1,46 @@
 #!/usr/bin/env bash
-# Configures a new ubuntu machine by installing
-# Nginx where it should be listening on port 80
-# Serve a page that would return a Hello World string
-#
+# This script installs the Nginx web server and configures the initial "Hello
+# world" page.
 
-echo -e "Updating and installing Nginx.\n"
-sudo apt-get update -y -qq && \
-	 sudo apt-get install nginx -y
+if [[ $EUID -ne 0 ]]; then
+  echo "ERROR: You need to be root to run this script" 1>&2
+  exit 1
+fi
 
-echo -e "\nSetting up some minor stuff.\n"
+# Update the package list and install Nginx
+apt-get update
+apt-get install -y nginx
 
-# starting nginx service
-sudo service nginx start
+# Create the default "Hello world" page
+echo "Hello World!" > /var/www/html/index.html
 
-# allowing nginx on firewall
-sudo ufw allow 'Nginx HTTP'
+# configure error 404 page
+echo "Ceci n'est pas une page" > /usr/share/nginx/html/404.html
 
-# Give the user ownership to website files for easy editing
-sudo chown -R "$USER":"$USER" /var/www/html
-sudo chmod -R 755 /var/www
+# confifure the server for redirection and 404 page
+echo -e "\tserver_name _;
+\tlocation /redirect_me {
+\t\treturn 301 https://lzcorp-landing-page.vercel.app/;
+\t}
 
-# Backup default index
-cp /var/www/html/index.nginx-debian.html /var/www/html/index.nginx-debian.html.bckp
+\terror_page 404 /404.html;
+\tlocation = /404.html {
+\t\troot /usr/share/nginx/html;
+\t\tinternal;
+\t}
+" > /tmp/new_config
 
-# Creating new index
-echo -e "Hello World!" > /var/www/html/index.nginx-debian.html
+sed -i '/server_name _;/{
+    r /tmp/new_config
+}' /etc/nginx/sites-available/default
 
-# Setting up /redirect_me to a youtube video
-sudo sed -i '24i\	rewrite ^/redirect_me https://www.youtube.com/watch?v=QH2-TGUlwu4 permanent;' /etc/nginx/sites-available/default
+# Remove the temporary configuration file
+rm /tmp/new_config
 
-# Set up a 404 page
-echo "Ceci n'est pas une page" >> /var/www/html/error_404.html
-sudo sed -i '25i\	error_page 404 /error_404.html;' /etc/nginx/sites-available/default
+# Start the Nginx service
+service nginx start
 
-# Restarting nginx
-sudo service nginx restart
-
-echo -e "\nCompleted.\n"
+if [[ ! $? ]]; then
+  echo "ERROR: Failed to start Nginx" 1>&2
+  exit 1
+fi
