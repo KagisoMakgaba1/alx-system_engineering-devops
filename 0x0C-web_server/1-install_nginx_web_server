@@ -2,28 +2,18 @@
 # This script installs the Nginx web server and configures the initial "Hello
 # world" page.
 
-# Update package lists
 apt-get update
-
-# Install nginx
 apt-get install -y nginx
 
-# Check if nginx is installed successfully
-if [ $? -ne 0 ]; then
-	echo "Failed to install nginx. Exiting."
-	exit 1
-fi
+mkdir /etc/nginx/html
+touch /etc/nginx/html/index.html
+echo "Holberton School" > /etc/nginx/html/index.html
+printf %s "server {
+     listen      80 default_server;
+     listen      [::]:80 default_server;
+     root        /etc/nginx/html;
+     index       index.html index.htm;
+}
+" > /etc/nginx/sites-available/default
 
-# Set nginx to listen on port 80
-sed -i 's/\(listen\s*\)80/\180/' /etc/nginx/sites-available/default
-
-# Restart nginx
 service nginx restart
-
-# Check if nginx is running
-if ! pgrep -x "nginx" > /dev/null; then
-	echo "Nginx failed to start. Exiting."
-	exit 1
-fi
-
-echo "Hello World" > /var/www/html/index.html
