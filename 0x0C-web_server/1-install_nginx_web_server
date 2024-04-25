@@ -18,7 +18,7 @@ echo "Hello World!" | sudo tee /var/www/html/index.html
 sudo nginx -t
 
 # Start the Nginx service
-sudo service nginx reload
+sudo service nginx start
 
 if [[ ! $? ]]; then
   echo "ERROR: Failed to start Nginx" 1>&2
