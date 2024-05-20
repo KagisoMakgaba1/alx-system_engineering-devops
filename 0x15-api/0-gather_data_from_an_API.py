@@ -1,23 +1,30 @@
 #!/usr/bin/python3
+'''
+gather employee data from API
+'''
 
-"""
-This script takes an employee ID and returns the information about his/her
-TODO list progress. Specifically, the ones they have completed.
-"""
-
-import lazy_methods
+import re
+import requests
 import sys
 
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        sys.stderr.write(f"Usage: {sys.argv[0]} <user_id>\n")
-        sys.exit(1)
+REST_API = "https://jsonplaceholder.typicode.com"
 
-    user = lazy_methods.get_name(sys.argv[1])
-    if user is None:
-        sys.stderr.write("Invalid user id.\n")
-        sys.exit(1)
-
-    todos = lazy_methods.get_todos(sys.argv[1])
-    completed_tasks = lazy_methods.get_completed_tasks(todos)
-    lazy_methods.print_completed_tasks(user, len(todos), completed_tasks)
+if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        if re.fullmatch(r'\d+', sys.argv[1]):
+            id = int(sys.argv[1])
+            req = requests.get('{}/users/{}'.format(REST_API, id)).json()
+            task_req = requests.get('{}/todos'.format(REST_API)).json()
+            emp_name = req.get('name')
+            tasks = list(filter(lambda x: x.get('userId') == id, task_req))
+            completed_tasks = list(filter(lambda x: x.get('completed'), tasks))
+            print(
+                'Employee {} is done with tasks({}/{}):'.format(
+                    emp_name,
+                    len(completed_tasks),
+                    len(tasks)
+                )
+            )
+            if len(completed_tasks) > 0:
+                for task in completed_tasks:
+                    print('\t {}'.format(task.get('title')))
