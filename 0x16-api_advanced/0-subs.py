@@ -7,32 +7,24 @@ import requests
 
 def number_of_subscribers(subreddit):
     """
-    Queries the Reddit API to return the number of subscribers for a
-    given subreddit.
+    Retrieves the number of subscribers for a given subreddit.
 
-    :param subreddit: The name of the subreddit.
-    :return: Number of subscribers or 0 if invalid subreddit.
+    Args:
+        subreddit (str): The name of the subreddit.
+
+    Returns:
+        int: The number of subscribers for the subreddit. Returns 0 if the
+        request fails or the subreddit does not exist.
     """
-    # Define the URL for the subreddit's about.json endpoint
-    url = f"https://www.reddit.com/r/{subreddit}/about.json"
+    response = requests.get(
+        "https://www.reddit.com/r/{}/about.json".format(subreddit),
+        allow_redirects=False,
+        headers={"user-agent": "nabuntu_bot-01"},
+        timeout=60,
+    )
 
-    # Set a custom User-Agent to avoid Too Many Requests errors
-    headers = {"User-Agent": "Mozilla/5.0 (compatible; myscript/1.0)"}
-
-    try:
-        # Make the GET request to the Reddit API
-        response = requests.get(url, headers=headers, allow_redirects=False)
-
-        # Check if the response status code indicates a successful request
-        if response.status_code == 200:
-            # Parse the JSON response
-            data = response.json()
-            # Extract the number of subscribers
-            subscribers = data['data']['subscribers']
-            return subscribers
-        else:
-            # If the subreddit is invalid or not found, return 0
-            return 0
-    except Exception:
-        # In case of any other exceptions, return 0
-        return 0
+    return (
+        response.json()["data"]["subscribers"]
+        if response.status_code == 200
+        else 0
+    )
